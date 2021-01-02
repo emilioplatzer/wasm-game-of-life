@@ -4,6 +4,8 @@ use std::fmt;
 
 use wasm_bindgen::prelude::*;
 
+use js_sys::Math;
+
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
@@ -92,7 +94,10 @@ impl Universe {
         //    })
         //    .collect();
 
-        let cells = (0..width * height).map(|_|{Cell::Dead}).collect();
+        let cells = (0..width * height).map(|_|{
+            let cell = if Math::random()<0.05 { Cell::Alive } else { Cell::Dead };
+            cell
+        }).collect();
 
         let mut new_universe = Universe {
             width,
@@ -105,7 +110,7 @@ impl Universe {
         let idx = new_universe.get_index(12,12); new_universe.cells[idx] = Cell::Alive;
         let idx = new_universe.get_index(12,12); new_universe.cells[idx] = Cell::Alive;
         
-        let aliveCells = [
+        let alive_cells = [
             (31,11), (31,12), (32,11), (32,12),
             (21,21),                   (21,24),
                                                 (22,25),
@@ -113,7 +118,7 @@ impl Universe {
                      (24,22), (24,23), (24,24), (24,25),
             (22,61), (22,62), (23,61), (23,62),
         ]; 
-        for pair in aliveCells.iter() {
+        for pair in alive_cells.iter() {
             let idx = new_universe.get_index(pair.0, pair.1);
             new_universe.cells[idx] = Cell::Alive;
         }
