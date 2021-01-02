@@ -82,21 +82,43 @@ impl Universe {
         let width = 64;
         let height = 64;
 
-        let cells = (0..width * height)
-            .map(|i| {
-                if i % 2 == 0 || i % 7 == 0 {
-                    Cell::Alive
-                } else {
-                    Cell::Dead
-                }
-            })
-            .collect();
+        //let cells = (0..width * height)
+        //    .map(|i| {
+        //        if i % 2 == 0 || i % 7 == 0 {
+        //            Cell::Alive
+        //        } else {
+        //            Cell::Dead
+        //        }
+        //    })
+        //    .collect();
 
-        Universe {
+        let cells = (0..width * height).map(|_|{Cell::Dead}).collect();
+
+        let mut new_universe = Universe {
             width,
             height,
             cells,
+        };
+
+        let idx = new_universe.get_index(11,11); new_universe.cells[idx] = Cell::Alive;
+        let idx = new_universe.get_index(11,12); new_universe.cells[idx] = Cell::Alive;
+        let idx = new_universe.get_index(12,12); new_universe.cells[idx] = Cell::Alive;
+        let idx = new_universe.get_index(12,12); new_universe.cells[idx] = Cell::Alive;
+        
+        let aliveCells = [
+            (31,11), (31,12), (32,11), (32,12),
+            (21,21),                   (21,24),
+                                                (22,25),
+            (23,21),                            (23,25),
+                     (24,22), (24,23), (24,24), (24,25),
+            (22,61), (22,62), (23,61), (23,62),
+        ]; 
+        for pair in aliveCells.iter() {
+            let idx = new_universe.get_index(pair.0, pair.1);
+            new_universe.cells[idx] = Cell::Alive;
         }
+
+        new_universe
     }
 
     pub fn width(&self) -> u32 {
