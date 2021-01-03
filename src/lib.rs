@@ -6,6 +6,15 @@ use wasm_bindgen::prelude::*;
 
 use js_sys::Math;
 
+extern crate web_sys;
+
+// A macro to provide `println!(..)`-style syntax for `console.log` logging.
+macro_rules! log {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    }
+}
+
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
@@ -57,6 +66,14 @@ impl Universe {
                 let cell = self.cells[idx];
                 let live_neighbors = self.live_neighbor_count(row, col);
 
+                log!(
+                    "cell[{}, {}] is initially {:?} and has {} live neighbors",
+                    row,
+                    col,
+                    cell,
+                    live_neighbors
+                );
+
                 let next_cell = match (cell, live_neighbors) {
                     // Rule 1: Any live cell with fewer than two live neighbours
                     // dies, as if caused by underpopulation.
@@ -74,6 +91,8 @@ impl Universe {
                     (otherwise, _) => otherwise,
                 };
 
+                log!("    it becomes {:?}", next_cell);
+
                 next[idx] = next_cell;
             }
         }
@@ -81,6 +100,7 @@ impl Universe {
         self.cells = next;
     }
     pub fn new() -> Universe {
+        utils::set_panic_hook();
         let width = 64;
         let height = 64;
 
@@ -94,8 +114,10 @@ impl Universe {
         //    })
         //    .collect();
 
-        let cells = (0..width * height).map(|_|{
-            let cell = if Math::random()<0.05 { Cell::Alive } else { Cell::Dead };
+        let cells = (0..width * height).map(|i|{
+            // let cell = if Math::random()<0.05 { Cell::Alive } else { Cell::Dead };
+            let cell = if i % 196 == 55 || i % 196 == (55+64) { Cell::Alive } else { Cell::Dead };
+            // let cell = Cell::Dead;
             cell
         }).collect();
 
@@ -118,6 +140,12 @@ impl Universe {
                      (24,22), (24,23), (24,24), (24,25),
             (22,61), (22,62), (23,61), (23,62),
         ]; 
+        let alive_cells2 = [
+            (40,30), (40,31), (39,32), (40,33), (40,34),
+            (41,30), (41,31),          (41,33), (41,34),
+            // (38,32), (37,32), (36,32), (35,32)
+            // (37,32), (35,32)
+        ];
         for pair in alive_cells.iter() {
             let idx = new_universe.get_index(pair.0, pair.1);
             new_universe.cells[idx] = Cell::Alive;

@@ -27,6 +27,7 @@ const renderLoop = () => {
 };
 
 setTimeout(function(){
+    debugger;
     drawGrid();
     drawCells();
     requestAnimationFrame(renderLoop);
